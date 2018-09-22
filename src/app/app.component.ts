@@ -12,18 +12,26 @@ import { VoteData } from './model/vote-data';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit, OnDestroy {
+  public showError = false;
+
   private destroy$ = new Subject<boolean>();
 
   constructor(private apiService: ApiService, private socketService: SocketService, private snackBar: MatSnackBar) { }
 
   ngOnInit() {
     merge(
-      this.apiService.getData(),
-      this.socketService.stream('data')
+      this.apiService.getData(this.showError),
+      this.socketService.stream<VoteData[]>('data')
     ).pipe(
+      tap(() => {
+        if (this.showError) {
+          throw new Error('FEHLER');
+        }
+      }),
       takeUntil(this.destroy$)
-    ).subscribe((voteData: VoteData) => {
-      this.showSnackBar(`Received data - User: ${voteData.user} Voted: ${voteData.voted}`);
+    ).subscribe((voteData: VoteData[]) => {
+      console.log(voteData);
+      this.showSnackBar(`Received data: ${JSON.stringify(voteData)}`);
     }, err => this.showSnackBar(err.message),
       () => this.showSnackBar('GetData completed')
     );

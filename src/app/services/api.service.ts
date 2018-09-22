@@ -9,7 +9,7 @@ import { VoteData } from '../model/vote-data';
 export class ApiService {
   constructor(private httpClient: HttpClient) { }
 
-  public getData(): Observable<VoteData> {
-    return this.httpClient.get<VoteData>('/api/test');
+  public getData(err = false): Observable<VoteData[]> {
+    return this.httpClient.get<VoteData[]>(err ? '/lel' : '/api/test');
   }
 }

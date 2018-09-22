@@ -1,6 +1,6 @@
 import { Injectable, NgZone } from '@angular/core';
-import { fromEventPattern, Observable } from 'rxjs';
-import { observeOn } from 'rxjs/operators';
+import { EMPTY, fromEventPattern, Observable, of } from 'rxjs';
+import { catchError, concatMap, observeOn, switchMap, tap } from 'rxjs/operators';
 import { enterZone } from '../zone/zone-scheduler';
 import * as io from 'socket.io-client';
 import Socket = SocketIOClient.Socket;
@@ -37,8 +37,11 @@ export class SocketService {
   public stream<T = any>(eventName: string): Observable<T> {
     return fromEventPattern<T>(handler => {
       return this.socket.on(eventName, handler);
-    }, () => this.socket.off(eventName), data => data.message ? data.message.data || data.message : data).pipe(
-      observeOn(enterZone(this.ngZone))
+    }, () => this.socket.off(eventName)).pipe(
+      observeOn(enterZone(this.ngZone)),
+      switchMap(v => of(v).pipe(
+        catchError(() => EMPTY)
+      ))
     );
   }
 

@@ -14,7 +14,7 @@ app.get('/api/test', (req, res) => {
   const data = {user: '123', voted: 2};
   let testData = [data];
   rxjs.interval(1000).pipe(
-    operators.take(20),
+    operators.take(200),
     operators.takeUntil(subject)
   ).subscribe(() => {
     testData = [...testData, data];
