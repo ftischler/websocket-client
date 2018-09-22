@@ -7,6 +7,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { MatSnackBarModule } from '@angular/material';
 import { FormsModule } from '@angular/forms';
 
+import * as io from 'socket.io-client';
+
 @NgModule({
   declarations: [
     AppComponent
@@ -18,7 +20,9 @@ import { FormsModule } from '@angular/forms';
     MatSnackBarModule,
     FormsModule
   ],
-  providers: [],
+  providers: [
+    {provide: 'io', useValue: io}
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

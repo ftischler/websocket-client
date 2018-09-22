@@ -27,7 +27,7 @@ const testResultPoll: ResultPoll = {
   isSecret: false
 };
 
-fdescribe('AppComponent', () => {
+xdescribe('AppComponent', () => {
   let consumer: NemoRxConsumer;
 
   beforeEach(() => {

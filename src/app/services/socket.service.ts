@@ -1,8 +1,8 @@
-import { Injectable, NgZone } from '@angular/core';
+import { Inject, Injectable, NgZone } from '@angular/core';
 import { EMPTY, fromEventPattern, Observable, of } from 'rxjs';
-import { catchError, concatMap, observeOn, switchMap, tap } from 'rxjs/operators';
+import { catchError, observeOn, switchMap } from 'rxjs/operators';
 import { enterZone } from '../zone/zone-scheduler';
-import * as io from 'socket.io-client';
+import {  } from 'socket.io-client';
 import Socket = SocketIOClient.Socket;
 import { SOCKET_CONFIG } from '../config/socket.config';
 
@@ -13,7 +13,7 @@ export class SocketService {
   private socketOptions: any;
   public socket: Socket;
 
-  constructor(private ngZone: NgZone) {
+  constructor(private ngZone: NgZone, @Inject('io') private io: SocketIOClientStatic) {
     this.createSocket();
   }
 
@@ -24,7 +24,7 @@ export class SocketService {
 
     this.socketOptions = {...SOCKET_CONFIG};
 
-    this.socket = io('/', this.socketOptions);
+    this.socket = this.io('/', this.socketOptions);
   }
 
   public sendMessage(channel: string, message: any): any {
@@ -38,10 +38,7 @@ export class SocketService {
     return fromEventPattern<T>(handler => {
       return this.socket.on(eventName, handler);
     }, () => this.socket.off(eventName)).pipe(
-      observeOn(enterZone(this.ngZone)),
-      switchMap(v => of(v).pipe(
-        catchError(() => EMPTY)
-      ))
+      observeOn(enterZone(this.ngZone))
     );
   }
 
